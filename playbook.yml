@@ -1,0 +1,90 @@
+- hosts: pinephone
+  tasks:
+  - name: Enable unstable repo
+    ansible.builtin.copy:
+      src: files/extrepo_mobian.sources
+      dest: /etc/apt/sources.list.d/extrepo_mobian.sources
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Install MMS pre-requisites
+    apt:
+      pkg:
+      - mmsd-tng
+      - libgtk-3-bin
+      - build-essential
+      - git
+      update_cache: yes
+
+  - name: Refresh systemd
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Stop mmsd
+    ansible.builtin.systemd:
+      name: mmsd
+      state: stopped
+      enabled: no
+
+  - name: Start mmsd-tng
+    become: yes
+    become_user: mobian
+    ansible.builtin.systemd:
+      scope: user
+      name: mmsd-tng
+      state: started
+
+  - name: Stop mmsd-tng
+    become: yes
+    become_user: mobian
+    ansible.builtin.systemd:
+      scope: user
+      name: mmsd-tng
+      state: stopped
+
+  - name: Copy Verizon setttings
+    ansible.builtin.copy:
+      src: files/mms
+      dest: /home/mobian/.mms/modemmanager/mms
+      owner: mobian
+      group: mobian
+      mode: 0644
+
+  - name: Start mmsd-tng
+    become: yes
+    become_user: mobian
+    ansible.builtin.systemd:
+      scope: user
+      name: mmsd-tng
+      state: started
+      enabled: yes
+
+  - name: Checkout chatty branch
+    ansible.builtin.git:
+      repo: 'https://source.puri.sm/kop316/chatty.git'
+      dest: /root/chatty
+      version: 'wip/sadiq/mm-account'
+
+  - name: Install chatty deps
+    apt:
+      pkg: /root/chatty
+      state: build-dep
+
+  - name: Meson build
+    ansible.builtin.command:
+      chdir: /root/chatty
+      cmd: meson build
+
+  - name: Ninja build
+    ansible.builtin.command:
+      chdir: /root/chatty
+      cmd: ninja -C build
+
+  - name: Ninja install
+    ansible.builtin.command:
+      chdir: /root/chatty/build
+      cmd: ninja install 
+
+  - name: Reboot
+    ansible.builtin.reboot:

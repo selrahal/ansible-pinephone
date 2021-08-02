@@ -1,0 +1,6 @@
+[Modem Manager]
+CarrierMMSC=http://mms.vtext.com/servlets/mms
+MMS_APN=vzwinternet
+CarrierMMSProxy=NULL
+AutoProcessOnConnection=true
+AutoProcessSMSWAP=false

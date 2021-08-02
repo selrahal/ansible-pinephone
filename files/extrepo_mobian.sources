@@ -1,0 +1,6 @@
+Types: deb deb-src
+Suites: unstable
+Architectures: amd64 arm64 armhf
+Uris: http://repo.mobian-project.org/
+Components: main non-free
+Signed-By: /var/lib/extrepo/keys/mobian.asc
