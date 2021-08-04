@@ -64,7 +64,7 @@
     ansible.builtin.git:
       repo: 'https://source.puri.sm/kop316/chatty.git'
       dest: /root/chatty
-      version: 'wip/sadiq/mm-account'
+      version: 'master'
 
   - name: Install chatty deps
     apt:
